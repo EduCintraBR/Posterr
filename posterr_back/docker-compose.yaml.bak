@@ -1,0 +1,52 @@
+version: "3"
+services:
+  posterr-db:
+    image: "mcr.microsoft.com/mssql/server:2022-preview-ubuntu-22.04"
+    container_name: "posterr-db"
+    ports:
+      - "1435:1433"
+    volumes:
+      - sqlsystem:/var/opt/mssql/
+      - sqldata:/var/opt/sqlserver/data
+      - sqllog:/var/opt/sqlserver/log
+    environment:
+      SA_PASSWORD: "dev@1234"
+      ACCEPT_EULA: "Y"
+
+  posterr:
+    container_name: "posterr"
+    build:
+      context: .
+      dockerfile: ./Posterr.WebApplication/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_CONNECTION_STRING=Server=posterr-db;Database=posterrdb;User=sa;Password=dev@1234
+      - ASPNETCORE_URLS=http://+:5001
+    ports:
+      - "8082:5001"
+    networks:
+      default:
+        aliases:
+          - posterr-chat.api
+    depends_on:
+      - posterr-db
+
+  migration:
+    container_name: "migration"
+    build:
+      context: .
+      dockerfile: ./Posterr.WebApplication/Dockerfile
+    command: >
+      bash -c "sleep 30 && dotnet ef database update --context ApplicationDbContext --verbose --no-launch-profile"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_CONNECTION_STRING=Server=posterr-db;Database=posterrdb;User=sa;Password=dev@1234
+    networks:
+      default:
+        aliases:
+          - migration
+
+volumes:
+  sqlsystem:
+  sqldata:
+  sqllog:
