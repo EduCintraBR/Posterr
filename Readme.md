@@ -56,8 +56,6 @@ Reflecting on the project, here are some areas that I would improve if I had mor
 
 5. **Code Optimization and Refactoring**: There is always room for optimizing the codebase for better performance and readability. This includes refactoring repeated code into reusable components and improving state management.
 
-Certainly! Let's answer these questions in detail.
-
 ### If this project were to grow and have many users and posts, which parts do you think would fail first?
 
 1. **Database Performance**:
